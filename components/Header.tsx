@@ -1,6 +1,6 @@
-import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import React from "react";
 
 const Header: React.FC = () => {
   const router = useRouter();
@@ -9,7 +9,7 @@ const Header: React.FC = () => {
 
   let left = (
     <div className="left">
-      <Link href="/">
+      <Link href="/" legacyBehavior>
         <a className="bold" data-active={isActive("/")}>
           Feed
         </a>
