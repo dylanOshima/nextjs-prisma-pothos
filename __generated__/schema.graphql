@@ -1,0 +1,86 @@
+input CreateDraftInput {
+  authorEmail: String!
+  content: String
+  title: String!
+}
+
+type CreateDraftPayload {
+  newPost: Post!
+}
+
+input DeletePostInput {
+  id: ID!
+}
+
+type DeletePostPayload {
+  success: Boolean!
+}
+
+type Mutation {
+  createDraft(input: CreateDraftInput!): CreateDraftPayload!
+  deletePost(input: DeletePostInput!): DeletePostPayload!
+  publish(input: PublishInput!): PublishPayload!
+  signupUser(input: SignupUserInput!): SignupUserPayload!
+}
+
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+}
+
+type Post implements Node {
+  author: User!
+  content: String
+  id: ID!
+  published: Boolean!
+  title: String!
+}
+
+input PublishInput {
+  id: ID!
+}
+
+type PublishPayload {
+  post: Post!
+}
+
+type Query {
+  drafts: [Post!]!
+  filterPosts(searchString: String): [Post!]!
+  node(id: ID!): Node
+  nodes(ids: [ID!]!): [Node]!
+  post(id: ID!): Post
+  posts(after: String, before: String, first: Int, last: Int): QueryPostsConnection!
+}
+
+type QueryPostsConnection {
+  edges: [QueryPostsConnectionEdge]!
+  pageInfo: PageInfo!
+}
+
+type QueryPostsConnectionEdge {
+  cursor: String!
+  node: Post!
+}
+
+input SignupUserInput {
+  email: String!
+  name: String
+}
+
+type SignupUserPayload {
+  newPost: User!
+}
+
+type User implements Node {
+  email: String
+  id: ID!
+  name: String
+  posts: [Post!]!
+}

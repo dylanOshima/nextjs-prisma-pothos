@@ -1,12 +1,12 @@
-import React from "react";
 import Router from "next/router";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 
 export type PostProps = {
   id: string;
   title: string;
   author: {
-    name: string;
+    name: string | null;
     email: string;
   } | null;
   content: string;

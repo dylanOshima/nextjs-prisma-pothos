@@ -1,17 +1,28 @@
 import { GetStaticProps } from "next";
-import React from "react";
+import React, { Suspense } from "react";
 import Layout from "../components/Layout";
+import MorePosts from "../components/MorePosts";
 import Post, { PostProps } from "../components/Post";
 import prisma from "../lib/prisma";
 
 export const getStaticProps: GetStaticProps = async () => {
   const feed = await prisma.post.findMany({
     where: { published: true },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      content: true,
+      published: true,
       author: {
-        select: { name: true },
+        select: {
+          name: true,
+          email: true,
+        },
       },
+      createdAt: false,
+      updatedAt: false,
     },
+    take: 2,
   });
   return {
     props: { feed },
@@ -24,6 +35,7 @@ type Props = {
 };
 
 const Blog: React.FC<Props> = (props) => {
+  const endCursor = props.feed[props.feed.length - 1].id;
   return (
     <Layout>
       <div className="page">
@@ -34,6 +46,10 @@ const Blog: React.FC<Props> = (props) => {
               <Post post={post} />
             </div>
           ))}
+          <h2>See more...</h2>
+          <Suspense fallback={<div>Loading...</div>}>
+            <MorePosts endCursor={endCursor} />
+          </Suspense>
         </main>
       </div>
       <style jsx>{`

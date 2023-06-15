@@ -16,6 +16,9 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       },
     },
   });
+  if (post == null) {
+    throw new Error();
+  }
   return {
     props: post,
   };
