@@ -1,35 +1,15 @@
-import { GetStaticProps } from "next";
-import React from "react";
 import Layout from "../components/Layout";
 import Post, { PostProps } from "../components/Post";
-import prisma from "../lib/prisma";
+import { gql } from "../lib/__generated__";
+import client from "../lib/apollo-client";
 
-export const getStaticProps: GetStaticProps = async () => {
-  const feed = await prisma.post.findMany({
-    where: { published: true },
-    include: {
-      author: {
-        select: { name: true },
-      },
-    },
-  });
-  return {
-    props: { feed },
-    revalidate: 10,
-  };
-};
-
-type Props = {
-  feed: PostProps[];
-};
-
-const Blog: React.FC<Props> = (props) => {
+const Blog: React.FC<{ data: { feed: PostProps[] } }> = (props) => {
   return (
     <Layout>
       <div className="page">
-        <h1>Public Feed</h1>
+        <h1>My Blog</h1>
         <main>
-          {props.feed.map((post) => (
+          {props.data.feed.map((post) => (
             <div key={post.id} className="post">
               <Post post={post} />
             </div>
@@ -53,5 +33,30 @@ const Blog: React.FC<Props> = (props) => {
     </Layout>
   );
 };
+
+export async function getServerSideProps() {
+  const { data } = await client.query({
+    query: gql(`
+      query FeedQuery {
+        feed {
+          id
+          title
+          content
+          published
+          author {
+            id
+            name
+          }
+        }
+      }
+    `),
+  });
+
+  return {
+    props: {
+      data,
+    },
+  };
+}
 
 export default Blog;
